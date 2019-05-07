@@ -1,0 +1,50 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<div>
+  <h1>Upcoming Elections</h1>
+  <p><b>For Address:</b> </p> 
+  <p>{{ street }}{% if street2 != '' %}, {% endif %} {{ street2 }}</p>
+  <p>{{ city }}, {{ state}} {{ zipcode}}</p>
+</div>
+<br>
+</div>
+{% if elections == [] %}
+  <p><b>There are currently no upcoming elections</b></p>
+{% else %}
+  {% for election in elections %}
+    <h2>{{ election['description'] }}</a></h2>
+    <p><b>Date:</b> {{ election['date'][0:10] }} <p>
+    <p><b>Polling Place:</b> <a href="{{ election['polling-place-url'] }}" target="_blank">{{ election['polling-place-url'] }}</a></p>
+    {% for district in election['district-divisions'] %}
+      <p><b>Voter Registration Authority Level:</b> {{ district['voter-registration-authority-level'] }} <p>
+      <p><b>Election Authority Level:</b> {{ district['election-authority-level'] }} <p> 
+      <p><b>Voter Registration Methods:</b> </p>
+      {% for regmethod in district['voter-registration-methods'] %}
+        <li>{{ regmethod['type'] }}
+          <ul>Deadline: {% if regmethod['deadline-online'] %}{{ regmethod['deadline-online'][0:10] }} {% endif %} {% if regmethod['deadline-postmarked'] %} {{ regmethod['deadline-postmarked'][0:10] }} {% endif %}</ul>
+          {% if regmethod['url'] %}<ul>Registration URL: <a href="{{ regmethod['url'] }}" target="_blank">{{ regmethod['url'] }}</a></ul>{% endif %}
+          {% if regmethod['instructions'] %}
+            {% for instruction in regmethod['instructions'].values() %}
+            <ul> {{ instruction }} </ul>
+            {% endfor %}
+          {% endif %}
+        </li>
+      {% endfor %}      
+      <p><b>Voting Methods:</b> </p>
+      {% for votingmethod in district['voting-methods'] %}
+        <li>{{ votingmethod['type'] }}</li>
+        <ul>Primary: {{ votingmethod['primary'] }}</ul>
+        <ul>Excuse Required: {{ votingmethod['excuse-required'] }}</ul>
+        {% if votingmethod['instructions'] %}
+          {% for instruction in votingmethod['instructions'].values() %}
+            <ul> {{ instruction }} </ul>
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+    <br>
+  {% endfor %}
+{% endif %}
+</div>
+{% endblock %}
